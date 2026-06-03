@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduTrack — Student Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Mulish:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy: #0a0f2e;
+  --navy2: #111936;
+  --blue: #2563eb;
+  --blue2: #1d4ed8;
+  --cyan: #06b6d4;
+  --accent: #f59e0b;
+  --white: #ffffff;
+  --text: #e2e8f0;
+  --muted: #94a3b8;
+  --card: rgba(255,255,255,0.04);
+  --card-border: rgba(255,255,255,0.08);
+  --radius: 16px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Mulish', sans-serif;
+  background: var(--navy);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, nav a, .btn {
+  font-family: 'Syne', sans-serif;
+}
+
+/* ── BACKGROUND GRID ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(37,99,235,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,0.06) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ── GLOW BLOBS ── */
+.blob {
+  position: fixed; border-radius: 50%;
+  filter: blur(80px); pointer-events: none; z-index: 0;
+  animation: drift 8s ease-in-out infinite alternate;
+}
+.blob1 { width: 500px; height: 500px; background: rgba(37,99,235,0.18); top: -100px; left: -100px; }
+.blob2 { width: 400px; height: 400px; background: rgba(6,182,212,0.12); bottom: 100px; right: -80px; animation-delay: -3s; }
+.blob3 { width: 300px; height: 300px; background: rgba(245,158,11,0.08); top: 50%; left: 50%; animation-delay: -5s; }
+@keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,20px) scale(1.05); } }
+
+/* everything above z-index 0 */
+nav, main, footer { position: relative; z-index: 1; }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0;
+  backdrop-filter: blur(20px);
+  background: rgba(10,15,46,0.85);
+  border-bottom: 1px solid var(--card-border);
+  padding: 0 40px; height: 68px;
+  display: flex; align-items: center; justify-content: space-between;
+  z-index: 100;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none;
+}
+.nav-logo-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.nav-logo-text { font-size: 20px; font-weight: 800; color: var(--white); letter-spacing: -0.03em; }
+.nav-logo-text span { color: var(--cyan); }
+.nav-links { display: flex; align-items: center; gap: 32px; }
+.nav-links a {
+  text-decoration: none; font-size: 14px; font-weight: 600;
+  color: var(--muted); letter-spacing: 0.02em;
+  transition: color .2s;
+}
+.nav-links a:hover { color: var(--white); }
+.nav-cta {
+  display: flex; align-items: center; gap: 12px;
+}
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px; border-radius: 10px;
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  text-decoration: none; transition: all .18s; border: none;
+  letter-spacing: 0.01em;
+}
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--card-border);
+  color: var(--text);
+}
+.btn-outline:hover { border-color: var(--blue); color: var(--white); background: rgba(37,99,235,0.1); }
+.btn-primary {
+  background: var(--blue);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(37,99,235,0.35);
+}
+.btn-primary:hover { background: var(--blue2); transform: translateY(-1px); box-shadow: 0 6px 28px rgba(37,99,235,0.45); }
+.btn-large { padding: 15px 34px; font-size: 16px; border-radius: 13px; }
+.btn-ghost { background: rgba(255,255,255,0.06); border: 1.5px solid var(--card-border); color: var(--text); }
+.btn-ghost:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+
+/* ── HERO ── */
+.hero {
+  min-height: calc(100vh - 68px);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 80px 24px 60px;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 16px; border-radius: 99px;
+  background: rgba(37,99,235,0.12);
+  border: 1px solid rgba(37,99,235,0.3);
+  font-size: 12px; font-weight: 600; color: #93c5fd;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  margin-bottom: 28px;
+  animation: fadeUp .6s ease both;
+}
+.hero-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+  animation: pulse 2s ease infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.hero h1 {
+  font-size: clamp(42px, 7vw, 80px);
+  font-weight: 800; line-height: 1.08;
+  letter-spacing: -0.04em; color: var(--white);
+  margin-bottom: 24px;
+  animation: fadeUp .7s .1s ease both;
+}
+.hero h1 .highlight {
+  background: linear-gradient(135deg, var(--blue) 0%, var(--cyan) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 18px; color: var(--muted); max-width: 560px;
+  line-height: 1.7; margin-bottom: 44px;
+  animation: fadeUp .7s .2s ease both;
+}
+.hero-actions {
+  display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+  margin-bottom: 70px;
+  animation: fadeUp .7s .3s ease both;
+}
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── HERO PREVIEW CARD ── */
+.hero-preview {
+  width: 100%; max-width: 860px;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+  animation: fadeUp .9s .4s ease both;
+}
+.preview-topbar {
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid var(--card-border);
+  padding: 12px 20px;
+  display: flex; align-items: center; gap: 12px;
+}
+.preview-dots { display: flex; gap: 6px; }
+.preview-dots span {
+  width: 12px; height: 12px; border-radius: 50%;
+}
+.preview-dots span:nth-child(1) { background: #ff5f57; }
+.preview-dots span:nth-child(2) { background: #febc2e; }
+.preview-dots span:nth-child(3) { background: #28c840; }
+.preview-url {
+  flex: 1; background: rgba(255,255,255,0.05); border-radius: 6px;
+  padding: 5px 14px; font-size: 12px; font-family: monospace;
+  color: var(--muted); text-align: center;
+}
+.preview-body { padding: 24px; }
+.preview-stats {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 12px;
+  margin-bottom: 20px;
+}
+.pstat {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--card-border);
+  border-radius: 12px; padding: 14px 16px;
+}
+.pstat-label { font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 6px; }
+.pstat-val { font-size: 24px; font-weight: 800; font-family: 'Syne', sans-serif; }
+.pstat-val.blue  { color: #60a5fa; }
+.pstat-val.green { color: #34d399; }
+.pstat-val.amber { color: #fbbf24; }
+.pstat-val.violet{ color: #a78bfa; }
+.preview-table-header {
+  display: grid; grid-template-columns: 2fr 1fr 1.5fr 1fr 1fr;
+  padding: 8px 12px;
+  font-size: 10px; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--muted); border-bottom: 1px solid var(--card-border);
+}
+.preview-row {
+  display: grid; grid-template-columns: 2fr 1fr 1.5fr 1fr 1fr;
+  padding: 11px 12px; font-size: 13px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  align-items: center; transition: background .15s;
+}
+.preview-row:hover { background: rgba(255,255,255,0.03); }
+.preview-row:last-child { border-bottom: none; }
+.p-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; margin-right: 10px;
+}
+.p-name { display: flex; align-items: center; }
+.p-badge {
+  display: inline-block; padding: 3px 9px; border-radius: 6px;
+  font-size: 11px; font-weight: 700;
+}
+.p-active   { background: rgba(52,211,153,0.12); color: #34d399; }
+.p-inactive { background: rgba(248,113,113,0.12); color: #f87171; }
+.p-a   { background: rgba(167,139,250,0.15); color: #a78bfa; }
+.p-b   { background: rgba(96,165,250,0.15);  color: #60a5fa; }
+.p-gpa { font-weight: 700; font-family: 'Syne', sans-serif; }
+.gpa-hi  { color: #34d399; }
+.gpa-mid { color: #fbbf24; }
+.gpa-lo  { color: #f87171; }
+
+/* ── STATS STRIP ── */
+.stats-strip {
+  border-top: 1px solid var(--card-border);
+  border-bottom: 1px solid var(--card-border);
+  padding: 40px 24px;
+}
+.stats-inner {
+  max-width: 960px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+  gap: 0; text-align: center;
+}
+.stat-item { padding: 12px 24px; border-right: 1px solid var(--card-border); }
+.stat-item:last-child { border-right: none; }
+.stat-num {
+  font-size: 42px; font-weight: 800; font-family: 'Syne', sans-serif;
+  background: linear-gradient(135deg, var(--white), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; line-height: 1;
+}
+.stat-lbl { font-size: 13px; color: var(--muted); margin-top: 6px; }
+
+/* ── FEATURES ── */
+.features { max-width: 1100px; margin: 0 auto; padding: 100px 24px; }
+.section-tag {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .12em; color: var(--cyan);
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: clamp(28px, 4vw, 44px); font-weight: 800;
+  color: var(--white); letter-spacing: -0.03em; line-height: 1.15;
+  margin-bottom: 16px;
+}
+.section-sub { font-size: 16px; color: var(--muted); max-width: 500px; line-height: 1.7; margin-bottom: 56px; }
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+  gap: 20px;
+}
+.feat-card {
+  background: var(--card); border: 1px solid var(--card-border);
+  border-radius: var(--radius); padding: 32px;
+  transition: border-color .2s, transform .2s, background .2s;
+  cursor: default;
+}
+.feat-card:hover {
+  border-color: rgba(37,99,235,0.4);
+  background: rgba(37,99,235,0.06);
+  transform: translateY(-4px);
+}
+.feat-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; margin-bottom: 20px;
+}
+.feat-icon.blue   { background: rgba(37,99,235,0.15); }
+.feat-icon.cyan   { background: rgba(6,182,212,0.15); }
+.feat-icon.green  { background: rgba(52,211,153,0.15); }
+.feat-icon.amber  { background: rgba(245,158,11,0.15); }
+.feat-icon.violet { background: rgba(167,139,250,0.15); }
+.feat-icon.red    { background: rgba(248,113,113,0.15); }
+.feat-title { font-size: 17px; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+.feat-desc  { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+/* ── HOW IT WORKS ── */
+.how { max-width: 1100px; margin: 0 auto; padding: 0 24px 100px; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 24px; position: relative; }
+.step {
+  background: var(--card); border: 1px solid var(--card-border);
+  border-radius: var(--radius); padding: 32px 28px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.step::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--blue), var(--cyan));
+}
+.step-num {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--blue), var(--cyan));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 800; font-family: 'Syne', sans-serif;
+  color: #fff; margin: 0 auto 18px;
+}
+.step-title { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+.step-desc  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* ── CTA ── */
+.cta-section {
+  max-width: 1100px; margin: 0 auto 100px;
+  padding: 0 24px;
+}
+.cta-box {
+  background: linear-gradient(135deg, rgba(37,99,235,0.2), rgba(6,182,212,0.1));
+  border: 1px solid rgba(37,99,235,0.3);
+  border-radius: 24px; padding: 70px 40px;
+  text-align: center; position: relative; overflow: hidden;
+}
+.cta-box::before {
+  content: ''; position: absolute;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: rgba(37,99,235,0.15); filter: blur(60px);
+  top: -80px; left: -60px; pointer-events: none;
+}
+.cta-box::after {
+  content: ''; position: absolute;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: rgba(6,182,212,0.12); filter: blur(40px);
+  bottom: -40px; right: -30px; pointer-events: none;
+}
+.cta-box h2 { font-size: clamp(28px, 4vw, 44px); font-weight: 800; color: var(--white); margin-bottom: 14px; letter-spacing: -0.03em; position: relative; z-index: 1; }
+.cta-box p  { font-size: 16px; color: var(--muted); margin-bottom: 36px; position: relative; z-index: 1; }
+.cta-box .btn { position: relative; z-index: 1; }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--card-border);
+  padding: 40px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 16px;
+}
+.footer-left { font-size: 13px; color: var(--muted); }
+.footer-left span { color: var(--cyan); font-weight: 600; }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-size: 13px; color: var(--muted); text-decoration: none; transition: color .15s; }
+.footer-links a:hover { color: var(--white); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  nav { padding: 0 16px; }
+  .nav-links { display: none; }
+  .preview-stats { grid-template-columns: repeat(2,1fr); }
+  .preview-table-header, .preview-row { grid-template-columns: 2fr 1fr 1fr; }
+  .preview-table-header > *:nth-child(3),
+  .preview-row > *:nth-child(3) { display: none; }
+  footer { flex-direction: column; text-align: center; }
+  .stat-item { border-right: none; border-bottom: 1px solid var(--card-border); }
+  .stat-item:last-child { border-bottom: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">
+    <div class="nav-logo-icon">🎓</div>
+    <span class="nav-logo-text">Edu<span>Track</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#how">How it works</a>
+    <a href="#stats">Stats</a>
+  </div>
+  <div class="nav-cta">
+    <a class="btn btn-outline" href="#">Login</a>
+    <a class="btn btn-primary" href="student-management.html">Open App →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="hero-badge-dot"></span>
+    Now live — Student Management System
+  </div>
+
+  <h1>Manage every student<br/>with <span class="highlight">total clarity</span></h1>
+
+  <p class="hero-sub">
+    A modern platform to track student records, grades, GPA performance
+    and department data — all in one place.
+  </p>
+
+  <div class="hero-actions">
+    <a class="btn btn-primary btn-large" href="student-management.html">
+      🚀 &nbsp;Open Dashboard
+    </a>
+    <a class="btn btn-ghost btn-large" href="#features">
+      See Features ↓
+    </a>
+  </div>
+
+  <!-- LIVE PREVIEW -->
+  <div class="hero-preview">
+    <div class="preview-topbar">
+      <div class="preview-dots">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="preview-url">localhost:5500 / student-management.html</div>
+    </div>
+    <div class="preview-body">
+      <div class="preview-stats">
+        <div class="pstat"><div class="pstat-label">Total Students</div><div class="pstat-val blue">128</div></div>
+        <div class="pstat"><div class="pstat-label">Active</div><div class="pstat-val green">114</div></div>
+        <div class="pstat"><div class="pstat-label">Avg GPA</div><div class="pstat-val amber">8.4</div></div>
+        <div class="pstat"><div class="pstat-label">Top GPA</div><div class="pstat-val violet">9.9</div></div>
+      </div>
+      <div class="preview-table-header">
+        <span>Student</span><span>Roll No</span><span>Department</span><span>Grade</span><span>Status</span>
+      </div>
+      <div class="preview-row">
+        <span class="p-name"><span class="p-avatar" style="background:rgba(96,165,250,0.15);color:#60a5fa">PR</span>Priya Ramesh</span>
+        <span style="font-family:monospace;font-size:12px;color:#94a3b8">CS2021001</span>
+        <span style="color:#94a3b8;font-size:13px">Comp. Sci</span>
+        <span class="p-badge p-a">A+</span>
+        <span class="p-badge p-active">Active</span>
+      </div>
+      <div class="preview-row">
+        <span class="p-name"><span class="p-avatar" style="background:rgba(52,211,153,0.15);color:#34d399">AM</span>Arjun Mehta</span>
+        <span style="font-family:monospace;font-size:12px;color:#94a3b8">EC2021042</span>
+        <span style="color:#94a3b8;font-size:13px">Electronics</span>
+        <span class="p-badge p-b">B+</span>
+        <span class="p-badge p-active">Active</span>
+      </div>
+      <div class="preview-row">
+        <span class="p-name"><span class="p-avatar" style="background:rgba(167,139,250,0.15);color:#a78bfa">SI</span>Sneha Iyer</span>
+        <span style="font-family:monospace;font-size:12px;color:#94a3b8">ME2020018</span>
+        <span style="color:#94a3b8;font-size:13px">Mechanical</span>
+        <span class="p-badge p-a">A</span>
+        <span class="p-badge p-active">Active</span>
+      </div>
+      <div class="preview-row">
+        <span class="p-name"><span class="p-avatar" style="background:rgba(248,113,113,0.15);color:#f87171">RD</span>Rahul Das</span>
+        <span style="font-family:monospace;font-size:12px;color:#94a3b8">CS2022031</span>
+        <span style="color:#94a3b8;font-size:13px">Comp. Sci</span>
+        <span class="p-badge" style="background:rgba(251,191,36,0.15);color:#fbbf24">C+</span>
+        <span class="p-badge p-inactive">Inactive</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS STRIP -->
+<div class="stats-strip" id="stats">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="stat-num">500+</div><div class="stat-lbl">Students managed</div></div>
+    <div class="stat-item"><div class="stat-num">12</div><div class="stat-lbl">Departments</div></div>
+    <div class="stat-item"><div class="stat-num">99%</div><div class="stat-lbl">Uptime</div></div>
+    <div class="stat-item"><div class="stat-num">0ms</div><div class="stat-lbl">Load time (local)</div></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-tag">Features</div>
+  <h2 class="section-title">Everything you need<br/>to run a school</h2>
+  <p class="section-sub">From adding students to tracking GPA trends — all the tools built into one clean interface.</p>
+
+  <div class="features-grid">
+    <div class="feat-card">
+      <div class="feat-icon blue">📋</div>
+      <div class="feat-title">Student Records</div>
+      <div class="feat-desc">Add, edit, and delete student profiles with name, roll number, email, department, grade and GPA.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon cyan">🔍</div>
+      <div class="feat-title">Smart Search</div>
+      <div class="feat-desc">Instantly search across all fields — name, roll number, email or department — in real time.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon green">📊</div>
+      <div class="feat-title">GPA Tracking</div>
+      <div class="feat-desc">Visual GPA progress bars color-coded green, amber, and red so you can spot struggling students instantly.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon amber">🏷️</div>
+      <div class="feat-title">Grade Badges</div>
+      <div class="feat-desc">Color-coded A, B, C grade badges and active/inactive status indicators for every student.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon violet">📈</div>
+      <div class="feat-title">Dashboard Stats</div>
+      <div class="feat-desc">Live counters for total students, active count, average GPA, and top performer — always up to date.</div>
+    </div>
+    <div class="feat-card">
+      <div class="feat-icon red">🔽</div>
+      <div class="feat-title">Sort & Filter</div>
+      <div class="feat-desc">Sort by any column, filter by department, and instantly narrow down to exactly who you need.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-tag">How it works</div>
+  <h2 class="section-title">Up and running in minutes</h2>
+  <p class="section-sub" style="margin-bottom:48px">No setup, no database, no server. Just open and use.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">Download the file</div>
+      <div class="step-desc">Get the single <code style="background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px;font-size:12px">index.html</code> file — no installation needed.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">Open in browser</div>
+      <div class="step-desc">Double-click the file or use VS Code Live Server to open it instantly in your browser.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">Add your students</div>
+      <div class="step-desc">Click "+ Add Student", fill in the details and your records are live immediately.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-title">Deploy anywhere</div>
+      <div class="step-desc">Upload to Netlify, GitHub Pages, or tiiny.host and share the link with anyone.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-box">
+    <h2>Ready to get started?</h2>
+    <p>Open the dashboard now — no sign-up, no installation required.</p>
+    <a class="btn btn-primary btn-large" href="student-management.html">Open Dashboard →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">Built with ❤️ — <span>EduTrack</span> Student Management System</div>
+  <div class="footer-links">
+    <a href="#">Home</a>
+    <a href="#features">Features</a>
+    <a href="student-management.html">Dashboard</a>
+  </div>
+</footer>
+
+</body>
+</html>
